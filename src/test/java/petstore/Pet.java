@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
 
 //3 - Classe
 public class Pet {
@@ -38,7 +40,14 @@ public class Pet {
                 .post(uri)
         .then()  // Então
                 .log().all()
-                .statusCode(200);
+                .statusCode(200)
+                .body("name",is("Melao")) // Validar se no jSON tem o nome cadastrado
+                .body("status",is("available"))
+                //.body("id",is(9223372036854775807L))
+                .body("id",is(19911012))
+                .body("category.name",is("Dog")) // coletando dados de dentro da categoria do json
+                .body("tags.name",contains("sta"))   // coletando dados de dentro da categoria do json com []
+                ;
     }
 
 }
