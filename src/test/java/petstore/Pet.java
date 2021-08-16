@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static io.restassured.RestAssured.basePath;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
@@ -17,16 +18,16 @@ import static org.hamcrest.Matchers.contains;
 //3 - Classe
 public class Pet {
     //3.1 - Atributos
-    String uri = "https://petstore.swagger.io/v2/pet"; // EnderereÃ§o da entidade Pet
+    String uri = "https://petstore.swagger.io/v2/pet"; // Enderereço da entidade Pet
 
 
-    //3.2 - Metodos e FunÃ§Ãµes
+    //3.2 - Metodos e Funções
     public String lerJson(String caminhoJson) throws IOException {
         return new String(Files.readAllBytes(Paths.get(caminhoJson)));
     }
 
     //incluir - create Post
-    @Test  //Identifica o metÃ³do ou funÃ§Ã£o como um teste para o Testng
+    @Test  //Identifica o metódo ou função como um teste para o Testng (priority = 1)
     public void incluirPet() throws IOException {
         String jsonBody = lerJson("json/pet1.json");
 
@@ -38,7 +39,7 @@ public class Pet {
                 .body(jsonBody)
         .when()  //Quando
                 .post(uri)
-        .then()  // EntÃ£o
+        .then()  // Então
                 .log().all()
                 .statusCode(200)
                 .body("name",is("Melao")) // Validar se no jSON tem o nome cadastrado
@@ -47,7 +48,47 @@ public class Pet {
                 .body("id",is(19911012))
                 .body("category.name",is("Dog")) // coletando dados de dentro da categoria do json
                 .body("tags.name",contains("sta"))   // coletando dados de dentro da categoria do json com []
-                ;
+
+        ;
+    }
+    @Test
+    public void consultarPet(){
+        String petId = "19911012";
+        String token =
+        given()
+                .contentType("application/json") //leia o arquivo
+                .log().all()
+        .when()
+                .get(uri + "/" + petId)    // concatena om / para fazer o get
+        .then()
+                .log().all()                     // pega o log e verifica se esta 200
+                .statusCode(200)
+                .body("category.name",is("Dog"))
+                .body("status",is("available"))
+        .extract()
+                .path("category.name")
+
+        ;
+        System.out.println("O token é validado :"  + token);
+    }
+    @Test
+    public void alterarPet() throws IOException {
+        String jsonBody = lerJson("json/pet2.json" );
+
+    given()
+            .contentType("aplication/json")
+            .log().all()
+            .body(jsonBody)
+    .when()
+            .put(uri)
+    .then()
+            .log().all()
+            .statusCode(200)
+            .body("status",is("Solded"))
+    ;
+
+
+
     }
 
 }
