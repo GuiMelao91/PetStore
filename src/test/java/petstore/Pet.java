@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static io.restassured.RestAssured.basePath;
+
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
@@ -27,7 +27,7 @@ public class Pet {
     }
 
     //incluir - create Post
-    @Test  //Identifica o metódo ou função como um teste para o Testng (priority = 1)
+    @Test (priority = 1) //Identifica o metódo ou função como um teste para o Testng (priority = 1)
     public void incluirPet() throws IOException {
         String jsonBody = lerJson("json/pet1.json");
 
@@ -42,7 +42,7 @@ public class Pet {
         .then()  // Então
                 .log().all()
                 .statusCode(200)
-                .body("name",is("Melao")) // Validar se no jSON tem o nome cadastrado
+                .body("name",is("acerola")) // Validar se no jSON tem o nome cadastrado
                 .body("status",is("available"))
                 //.body("id",is(9223372036854775807L))
                 .body("id",is(19911012))
@@ -51,7 +51,7 @@ public class Pet {
 
         ;
     }
-    @Test
+    @Test (priority = 2)
     public void consultarPet(){
         String petId = "19911012";
         String token =
@@ -71,12 +71,12 @@ public class Pet {
         ;
         System.out.println("O token é validado :"  + token);
     }
-    @Test
-    public void alterarPet() throws IOException {
+    @Test (priority = 3)
+    public void alterarPet() throws IOException {          //put
         String jsonBody = lerJson("json/pet2.json" );
 
     given()
-            .contentType("aplication/json")
+            .contentType("application/json")
             .log().all()
             .body(jsonBody)
     .when()
@@ -85,8 +85,25 @@ public class Pet {
             .log().all()
             .statusCode(200)
             .body("status",is("Solded"))
+            .body("name",is("acerola"))
     ;
+    }
+    @Test (priority = 4)
+    public void excluirPet(){       //Excluir - delete
+        String petId = "19911012";
 
+    given()
+            .contentType("application/json")
+            .log().all()
+    .when()
+            .delete(uri + "/" + petId)
+    .then()
+            .log().all()
+            .statusCode(200)
+            .body("code",is(200))
+            .body("type",is("unknown"))
+            .body("message",is(petId))
+    ;
 
 
     }
